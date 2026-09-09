@@ -1,0 +1,24 @@
+import fs from "fs";
+import { ErrorHandler } from "../middleware/error.js";
+
+export const streamDownload = (filePath, res, originalName) => {
+  try {
+    if (!fs.existsSync(filePath)) {
+      throw new ErrorHandler("File not found");
+    }
+    res.download(filePath, originalName, (err) => {
+      if (err) {
+        throw new ErrorHandler("Error downloading file", 500);
+      }
+    });
+  } catch (error) {
+    if (error instanceof ErrorHandler) {
+      return res
+        .status(error.statusCode)
+        .json({ success: false, error: error.message });
+    }
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal Server Error" });
+  }
+};
