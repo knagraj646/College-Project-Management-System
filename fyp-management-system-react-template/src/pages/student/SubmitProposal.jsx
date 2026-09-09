@@ -1,0 +1,85 @@
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { submitProjectProposal } from "../../store/slices/studentSlice";
+
+const SubmitProposal = () => {
+  // FIX: Changed curly braces {} to square brackets []
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      // Note: If you want to await an async thunk, you may need to add .unwrap()
+      // e.g., await dispatch(submitProjectProposal(formData)).unwrap();
+      dispatch(submitProjectProposal(formData));
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <>
+      {/* FIX: Changed clasName to className */}
+      <div className="space-y-6">
+        <div className="card">
+          {/* FIX: Changed clasName to className */}
+          <div className="card-header">
+            <h1 className="card-title">Submit Proposal</h1>
+            <p className="card-subtitle">
+              Please fill out all sections of your project.
+            </p>
+          </div>
+          {/* FIX: Changed clasName to className */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="form-group">
+              <label className="label">Project Title</label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                className="input"
+                placeholder="Enter project title"
+                required
+              />
+            </div>
+            <div>
+              <label className="label">Project Description</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                className="input min-h-[120px]"
+                placeholder="Enter project description"
+                required
+              />
+            </div>
+            <div className="flex justify-end space-x-4 pt-4 border-t border-slate-200">
+              <button
+                className="btn btn-primary disabled:opacity-50"
+                type="submit"
+                disabled={isLoading}
+              >
+                {isLoading ? "Submitting..." : "Submit Proposal"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default SubmitProposal;
