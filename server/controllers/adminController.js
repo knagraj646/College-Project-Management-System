@@ -143,20 +143,22 @@ export const getAllProjects = asyncHandler(async (req, res, next) => {
 export const getDashboardStats = asyncHandler(async (req, res, next) => {
   const [
     totalStudents,
-    totalProjects,
+    totalProjects, // Was missing in your Promise array
     totalTeachers,
     pendingProjects,
     pendingRequests,
     completedProjects,
   ] = await Promise.all([
-    User,
-    countDocuments({ role: "Student" }),
+    User.countDocuments({ role: "Student" }), // FIX: Removed stray comma
+    Project.countDocuments(), // FIX: Added missing totalProjects query
     User.countDocuments({ role: "Teacher" }),
     Project.countDocuments({ status: "Pending" }),
     supervisorRequest.countDocuments({ status: "Pending" }),
     Project.countDocuments({ status: "Completed" }),
   ]);
-  res.status.json({
+
+  // FIX: Changed res.status.json to res.status(200).json
+  res.status(200).json({
     success: true,
     message: "Dashboard stats fetched successfully",
     data: {

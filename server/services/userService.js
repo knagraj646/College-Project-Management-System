@@ -37,12 +37,16 @@ export const deleteUser = async (id) => {
 
 export const getAllUsers = async () => {
   const query = { role: { $ne: "Admin" } };
-  const users = (
-    await User.find(query).select(
-      "-password -resetPasswordToken -resetPasswordExpire",
-    )
-  ).sort({ createdAt: -1 });
-  const total = await user.countDocuments(query);
+
+  // FIX 1: Chain .sort() directly to Mongoose before the await
+  const users = await User.find(query)
+    .select("-password -resetPasswordToken -resetPasswordExpire")
+    .sort({ createdAt: -1 });
+
+  // FIX 2: Capitalized 'User'
+  const total = await User.countDocuments(query);
+
+  // If your controller needs the total, you might want to return { users, total };
   return users;
 };
 export const assignSupervisorDirectly = async (studentId, supervisorId) => {
